@@ -83,7 +83,6 @@ class KNearestNeighbors :
         return dist_matrix
 
     def _manhattan(self, X_test):
-        self.X_test_reshaped = np.expand_dims(X_test, 1)
         X_diff = self.X_train_reshaped - X_test
         dist_matrix = abs(X_diff).sum(axis=2)
         return dist_matrix
