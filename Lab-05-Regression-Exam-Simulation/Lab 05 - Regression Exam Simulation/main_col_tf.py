@@ -150,7 +150,7 @@ def main():
     X_train_processed = preprocessor.transform(X_train)
     X_test_processed = preprocessor.transform(X_test)
 
-    print("✅ Preprocessing complete with no data leakage.")
+    print("Preprocessing complete with no data leakage.")
     print(f"X_train_processed shape: {X_train_processed.shape}")
     print(f"X_test_processed shape: {X_test_processed.shape}")
 
@@ -270,7 +270,7 @@ def main():
 
 
 
-    #-------START OF HYPERPARAMETER TUNING(RANDOM FOREST vs RIDGE vs GRADBOOST)
+    '''#-------START OF HYPERPARAMETER TUNING(RANDOM FOREST vs RIDGE vs GRADBOOST)
     param_grid_ridge = {'regressor__alpha' : [0.1, 0.2, 0.3], 
                         'regressor__fit_intercept' : [True, False]} 
 
@@ -310,12 +310,37 @@ def main():
     r2_ridge = r2_score(y_test,y_pred_ridge)
     print(f"Tuned gradient boost: {r2_ridge}")
 
+    
+    #RESULTS:
+    #Tuned polynomial ridge: 0.7229202287957441
+    #Tuned Random Forest: 0.808956579530163
+    #Tuned gradient boost: 0.7797565713015698
+    
+
     '''
-    RESULTS:
-    Tuned polynomial ridge: 0.7229202287957441
-    Tuned Random Forest: 0.808956579530163
-    Tuned gradient boost: 0.7797565713015698
-    '''
+
+    #------FINAL RESULTS-----------
+    final_pipline = Pipeline([
+        ('preprocessor', preprocessor),
+        ('regressor',  RandomForestRegressor(random_state=42,n_estimators=200,max_depth=None, min_samples_split=5,min_samples_leaf=1,n_jobs=-1))
+    ])
+    
+    final_pipline.fit(X,y)
+    test_data = pd.read_csv(r"test_dataset.csv",sep=',')
+    y_final_pred = final_pipline.predict(test_data)
+
+    submission = pd.DataFrame()
+
+    if 'id' in test_data.columns:
+        submission['index'] = test_data['index']
+    else:
+        submission['index'] = test_data.index
+
+    submission["value"] = y_final_pred
+
+    submission.to_csv(submission_path,index=False)
+    print("Submission saved successfully.")
+    
     
 
 if __name__ == "__main__":
